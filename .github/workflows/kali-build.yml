@@ -1,0 +1,25 @@
+name: Kali Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Kali ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    container:
+      image: kalilinux/kali-rolling
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - archived-6.12.38
+          - rolling
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build module
+        run: bash .github/scripts/build-kali.sh "${{ matrix.target }}"

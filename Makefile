@@ -1718,6 +1718,11 @@ $(MODULE_NAME)-y += $(_PLATFORM_FILES)
 
 $(MODULE_NAME)-$(CONFIG_MP_INCLUDED) += core/rtw_mp.o
 
+# Newer kernels no longer propagate EXTRA_CFLAGS reliably for external modules.
+# Mirror the accumulated flags into subdir-ccflags-y so nested sources still
+# pick up the driver's private include paths and feature defines.
+subdir-ccflags-y += $(EXTRA_CFLAGS)
+
 obj-$(CONFIG_88XXAU) := $(MODULE_NAME).o
 
 else
