@@ -1787,6 +1787,8 @@ config_r:
 	/bin/bash script/Configure script/config.in
 
 DRIVER_VERSION = $(shell grep "\#define DRIVERVERSION" include/rtw_version.h | awk '{print $$3}' | tr -d v\")
+CONFLICT_BLACKLIST_FILE ?= /etc/modprobe.d/8812au-blacklist.conf
+CONFLICT_SCRIPT ?= tools/manage-conflicting-modules.sh
 
 dkms_install:
 	@mkdir -vp /usr/src/8812au-$(DRIVER_VERSION)
@@ -1794,11 +1796,23 @@ dkms_install:
 	dkms add -m 8812au -v $(DRIVER_VERSION)
 	+ dkms build -m 8812au -v $(DRIVER_VERSION)
 	dkms install -m 8812au -v $(DRIVER_VERSION)
+	@CONFLICT_BLACKLIST_FILE=$(CONFLICT_BLACKLIST_FILE) sh $(CONFLICT_SCRIPT) install
+	@echo "Reboot or reattach the adapter if it is currently bound to rtw88_8821au."
 	dkms status -m 8812au
 
 dkms_remove:
 	dkms remove 8812au/$(DRIVER_VERSION) --all
 	rm -rf /usr/src/8812au-$(DRIVER_VERSION)
+	@CONFLICT_BLACKLIST_FILE=$(CONFLICT_BLACKLIST_FILE) sh $(CONFLICT_SCRIPT) remove
+
+install_blacklist:
+	@CONFLICT_BLACKLIST_FILE=$(CONFLICT_BLACKLIST_FILE) sh $(CONFLICT_SCRIPT) install
+
+remove_blacklist:
+	@CONFLICT_BLACKLIST_FILE=$(CONFLICT_BLACKLIST_FILE) sh $(CONFLICT_SCRIPT) remove
+
+status_blacklist:
+	@CONFLICT_BLACKLIST_FILE=$(CONFLICT_BLACKLIST_FILE) sh $(CONFLICT_SCRIPT) status
 
 .PHONY: modules clean
 

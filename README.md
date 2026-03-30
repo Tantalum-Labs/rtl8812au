@@ -87,11 +87,24 @@ In order to install the driver open a terminal in the directory with the source 
 ```
 $ sudo make dkms_install
 ```
+This also writes `/etc/modprobe.d/8812au-blacklist.conf` to blacklist the
+in-kernel `rtw88_8812au` and `rtw88_8821au` modules so `88XXau` can bind
+supported devices first after reboot or USB reattach.
 
 ### Removal of Driver
 In order to remove the driver from your system open a terminal in the directory with the source code and execute the following command:
 ```
 $ sudo make dkms_remove
+```
+This removes `/etc/modprobe.d/8812au-blacklist.conf` along with the DKMS
+package staging directory.
+
+### Blacklist helper
+If the driver is already installed and you only need to apply or inspect the
+conflict blacklist, use:
+```
+$ sudo make install_blacklist
+$ make status_blacklist
 ```
 
 ### Make
